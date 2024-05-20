@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans /Users/haru/schema/spring-beans.xsd 
+	http://www.springframework.org/schema/jdbc  /Users/haru/schema/spring-jdbc.xsd.xml 
+	http://www.springframework.org/schema/context /Users/haru/schema/spring-context.xsd 
+	http://www.springframework.org/schema/tx /Users/haru/schema/spring-tx.xsd.xml
+	http://mybatis.org/schema/mybatis-spring /Users/haru/schema/mybatis-spring.xsd
+	">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<context:component-scan base-package="su.spring.test"></context:component-scan>
+		
+	<bean class="com.zaxxer.hikari.HikariDataSource" id="hikariDataSource" destroy-method="close"> 
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:xe"/>
+		<property name="username" value="junsu"/>
+		<property name="password" value="pass"/>
+	</bean>
+	
+		
+	<!--SqlSessionFactory 인터페이스를 생성하는 빈을 구현하고 팩토리에서 빈으로 호출한 결과를 반환한다.-->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactoryBean">
+		<property name="dataSource" ref="hikariDataSource"/>
+		<property name="configLocation" value="classpath:/configuration/config.xml"/>
+		<property name="mapperLocations" value="classpath:/mapper/*.xml"/>
+	</bean>
+	
+	<!-- SqlSession 인터페이스의 인터페이스를 대체하여 SqlSession 인터페이스의 모든 기능을 구현한다 -->
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactoryBean" />
+	</bean>
+
+	<!-- @Transactional 어노테이션을 사용할 수 있도록 설정한다. -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>
